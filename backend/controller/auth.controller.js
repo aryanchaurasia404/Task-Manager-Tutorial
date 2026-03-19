@@ -1,4 +1,4 @@
-import user from "../models/user.model.js"
+import User from "../models/user.model.js"
 import bcryptjs from "bcryptjs"
 export const signup = async(req ,res,next) => {
 const{name,email,password,profileImageUrl,adminJoinCode} = req.body
@@ -14,9 +14,9 @@ if(!name ||
 }
 //check if user already exist
 
-const isAlreadyExist = await user.findOne({email})
+const isAlreadyExist = await User.findOne({email})
 
-if (AlreadyExist){
+if (isAlreadyExist){
   return res
   .status(400)
   .json({success: false, message:"User already exist"})
