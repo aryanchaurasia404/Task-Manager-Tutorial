@@ -2,9 +2,12 @@ import express from "express"
 import cors from "cors"
 import dotenv from "dotenv"
 import mongoose from "mongoose"
+import authRoutes from "./routes/auth.route.js"
+
 dotenv.config()
 mongoose
-.connect(process.env.MONGO_URL).then(()=>{
+.connect(process.env.MONGO_URL)
+.then(()=>{
     console.log("Database is connected")
 })
 .catch((err)=>{
@@ -21,9 +24,13 @@ const app = express()
         allowedHeaders:["Content-Type", "Authorization"],
 
     })
- )
+ );
+ 
  //Middleware to handle jspn object in req body
  app.use(express.json())
 app.listen(3000, () => {
     console.log("Server is running on port 3000!")
 })
+
+app.use("/api/auth",authRoutes);
+
