@@ -76,3 +76,18 @@ try {
 }
 
 }
+
+export const userProfile = async ( req , res , next) => {
+    try {
+        const user = await User.findById(req.user.id)
+
+        if(!user){
+            return next(errorHandler(404, "User not found!"))
+        }
+        const{password:pass, ...rest} = user._doc
+        res.status(200).json(rest)
+    } catch (error) {
+        next(error)
+        
+    }
+}
