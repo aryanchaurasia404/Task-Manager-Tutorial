@@ -68,8 +68,8 @@ try {
         return next(errorHandler(400,"Wrong Credetials"))
     }
 
-    const token = jwt.sign({id:validUser._id},process.env.JWT_SECRET)
-
+    const token = jwt.sign({id:validUser._id,role:validUser.role},process.env.JWT_SECRET)
+ 
     const{ password: pass, ...rest} = validUser._doc
     res.status(200).cookie("access_token",token,{httpOnly:true}).json(rest)
 } catch (error) {
