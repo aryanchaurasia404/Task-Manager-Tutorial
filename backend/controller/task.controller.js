@@ -31,7 +31,7 @@ res.status(201).json({message: "Task Created Successfully ", task})
     }
 }
 
-export const getTask = async (req,res , next) => {
+export const getTasks = async (req,res , next) => {
     try {
         const {status} = req.query
         let filter = {}
@@ -40,7 +40,7 @@ export const getTask = async (req,res , next) => {
         }
         let tasks
         if(req.user.role ==="admin"){
-            task = await Task.find(filter).populate(
+            tasks = await Task.find(filter).populate(
                 "assignedTo",
                 "name email profileImageUrl"
             )
@@ -52,18 +52,45 @@ export const getTask = async (req,res , next) => {
             }).populate("assignedTo" , "name email profileImageUrl")
         }
 
-        task = await Promise.all(
-            task.map(async(task) => {
-                const completedCount = task.todoChecklist.filter((itm) => Item.completed).length
-            })
-        )
+        tasks = await Promise.all(
+            tasks.map(async(task) => {
+                const completedCount = task.todoChecklist.filter((item) => item.completed).length
+            
+        
         return{...task._doc , completedCount:completedCount }
+    })
+)
+//status summary count
 
-        //status summary count aryan developer
-
-        const allTask = await Task.countDocuments(
+        const allTasks = await Task.countDocuments(
             req.user.role === "admin" ? {} : {assignedTo: req.user.id}
         )
+        const pendingTasks = await Task.countDocuments({
+            ...filter,
+            status:"Pending" ,
+        //if pending user is not admin then assgned to filter
+        //if logged in user is a admin then nothing do
+        ...(req.user.role !== "admin" && {assignedTo: req.user.id}),
+        })
+           const inProgressTasks = await Task.countDocuments({
+            ...filter,
+            status:"In Progress" ,
+        ...(req.user.role !== "admin" && {assignedTo: req.user.id}),
+        }) 
+        const completedTasks = await Task.countDocuments({
+            ...filter,
+            status:"Completed" ,
+        ...(req.user.role !== "admin" && {assignedTo: req.user.id}),
+        }) 
+     res.status(200).json({
+        tasks,
+        statusSummary: {
+            all: allTasks,
+            pendingTasks,
+            completedTasks,
+        }
+     })
+            
     } catch (error) {
         next(error)
     }
