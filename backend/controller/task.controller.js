@@ -30,3 +30,41 @@ res.status(201).json({message: "Task Created Successfully ", task})
         next(error)
     }
 }
+
+export const getTask = async (req,res , next) => {
+    try {
+        const {status} = req.query
+        let filter = {}
+        if(status){
+            filter.status = status
+        }
+        let tasks
+        if(req.user.role ==="admin"){
+            task = await Task.find(filter).populate(
+                "assignedTo",
+                "name email profileImageUrl"
+            )
+        }else{
+            tasks = await Task.find({
+                ...filter,
+                assignedTo:req.user.id,
+
+            }).populate("assignedTo" , "name email profileImageUrl")
+        }
+
+        task = await Promise.all(
+            task.map(async(task) => {
+                const completedCount = task.todoChecklist.filter((itm) => Item.completed).length
+            })
+        )
+        return{...task._doc , completedCount:completedCount }
+
+        //status summary count aryan developer
+
+        const allTask = await Task.countDocuments(
+            req.user.role === "admin" ? {} : {assignedTo: req.user.id}
+        )
+    } catch (error) {
+        next(error)
+    }
+}
