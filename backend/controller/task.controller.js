@@ -148,3 +148,27 @@ if (!task){
         next(error)
     }
 }
+
+export const updateTaskStatus = async(req,res,next) => {
+    try {
+        const task = await Task.findById(req.params.id)
+
+        if(!task){
+            return next(errorHandler(404 , "Task Not Found"))
+        }
+        const isAssigned = task.assignedTo.some((userId) => userId.toString()===req.user.id.toString()
+    ) 
+    if(!isAssigned && req.user.role !== "admin"){
+        return next(errorHandler(403,"Unauthorized"))
+    }
+    task.status = req.body.status || task.status
+    if(task.status == "Completed"){
+        task.todoChecklist.forEach((item) => item.completed = true)
+    }
+    await task.save()
+    res.status(200).json({message:"Task status completed" , task})
+    } catch (error) {
+        next(error)
+        
+    }
+}
