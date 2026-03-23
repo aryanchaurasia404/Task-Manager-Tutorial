@@ -6,6 +6,8 @@ import authRoutes from "./routes/auth.route.js"
 import cookieParser from "cookie-parser"
 import userRoutes from "./routes/user.route.js"
 import taskRoutes from "./routes/task.route.js"
+import reportRoutes from "./routes/report.route.js"
+
 
 dotenv.config()
 mongoose
@@ -41,6 +43,7 @@ app.use("/api/auth",authRoutes)
 
 app.use("/api/users",userRoutes)
 app.use("/api/tasks" , taskRoutes)
+app.use("/api/reports" , reportRoutes)
 
 app.use((err,req,res,next) => {
     const statusCode = err.statusCode || 500
