@@ -1,5 +1,6 @@
 import { errorHandler } from "../utils/error.js"
 import Task from '../models/task.model.js'
+import mongoose from "mongoose"
 export const createTask = async(req , res , next) => {
     try {
         const{title ,
@@ -289,13 +290,10 @@ export const getDashboardData = async (req, res, next) => {
 export const userDashboardData = async (req, res, next) => {
   try {
     const userId = req.user.id
+    //console.log(userid)
+    //convert user id to object id
 
-    // console.log(userId)
-
-    // Convert userId to ObjectId for proper matching
     const userObjectId = new mongoose.Types.ObjectId(userId)
-
-    // console.log(userObjectId)
 
     // fetch statistics for user-specific tasks
     const totalTasks = await Task.countDocuments({ assignedTo: userId })
